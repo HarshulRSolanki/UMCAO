@@ -1,0 +1,52 @@
+
+.umcao-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 300ms ease,
+    background-color 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.umcao-logo-image {
+  display: block;
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+  transition:
+    transform 350ms ease,
+    filter 350ms ease;
+}
+
+/* Interactive hover */
+.umcao-logo:hover {
+  transform: translateY(-4px) scale(1.03);
+  background-color: #888CBB18;
+  box-shadow: 0 8px 24px #888CBB35;
+}
+
+.umcao-logo:hover .umcao-logo-image {
+  filter: drop-shadow(0 4px 8px #888CBB55);
+}
+
+.umcao-logo:active {
+  transform: scale(0.96);
+}
+
+.umcao-logo:focus-visible {
+  outline: 3px solid #888CBB;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .umcao-logo,
+  .umcao-logo-image {
+    transition: none;
+  }
+}

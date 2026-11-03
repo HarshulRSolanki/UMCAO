@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-app: #FDFAF5;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F8FAF7;
+    --bg-secondary: #F3F5F2;
+    --border-light: #E5E9E5;
+    --border-hover: #D0D7D0;
+    --text-primary: #202824;
+    --text-secondary: #68736D;
+    --text-muted: #8E9993;
+    --primary: #174F4A;
+    --primary-hover: #123E3A;
+    --success: #21865A;
+    --error: #D64545;
+    --warning: #D99A28;
+    --info: #3979B9;
+    --code-bg: #FFFFFF;
+    --code-gutter: #F3F5F2;
+  }
+
+  body {
+    background-color: #FDFAF5;
+    color: #202824;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Custom sleek bright scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #D0D7D0 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #D0D7D0;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A0ABA3;
+}
+
+/* Monospace Code Editor Font */
+.font-mono-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
