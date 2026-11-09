@@ -21,12 +21,14 @@ load_dotenv(dotenv_path=ENV_PATH)
 
 MAX_CODE_CHARS = 25000  # Input safety limit
 
-FALLBACK_MODELS = [
-    os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
+_env_model = os.getenv("GEMINI_MODEL", "").strip()
+FALLBACK_MODELS = list(dict.fromkeys(m for m in [
+    _env_model,
     "gemini-3.5-flash-lite",
     "gemini-3.5-flash",
-    "gemini-3.8-flash",
-]
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash",
+] if m))
 
 
 def _get_gemini_client() -> genai.Client:
@@ -34,8 +36,8 @@ def _get_gemini_client() -> genai.Client:
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         raise ValueError(
-            "GEMINI_API_KEY is not configured in backend/.env. "
-            "Please configure a valid Gemini API key in backend/.env to use AI features."
+            "GEMINI_API_KEY is not configured. "
+            "Set GEMINI_API_KEY in Render Environment Variables or backend/.env to use AI features."
         )
     return genai.Client(api_key=api_key)
 
@@ -180,7 +182,20 @@ def explain_code_with_gemini(
             "error": f"Code length ({len(clean_code)} chars) exceeds maximum allowed limit ({MAX_CODE_CHARS} chars).",
         }
 
-    client = _get_gemini_client()
+    try:
+        client = _get_gemini_client()
+    except ValueError as e:
+        return {
+            "success": False,
+            "language": language,
+            "mode": mode,
+            "explanation_language": explanation_language,
+            "markdown": "",
+            "sections": None,
+            "model_used": "none",
+            "timestamp": timestamp,
+            "error": str(e),
+        }
     system_instruction = _build_system_instruction(mode, explanation_language, language)
 
     user_prompt = f"""Please explain the following {language.upper()} code in {explanation_language.capitalize()} according to the {mode.upper()} mode specifications.
@@ -263,7 +278,16 @@ def chat_with_gemini(
             "error": "Message cannot be empty.",
         }
 
-    client = _get_gemini_client()
+    try:
+        client = _get_gemini_client()
+    except ValueError as e:
+        return {
+            "success": False,
+            "reply": "",
+            "model_used": "none",
+            "timestamp": timestamp,
+            "error": str(e),
+        }
     lang_name = explanation_language.capitalize()
 
     system_instruction = f"""You are the UMCAO Code Explainer AI Assistant.
@@ -376,7 +400,18 @@ def explain_error_with_gemini(
             "error": "No code provided.",
         }
 
-    client = _get_gemini_client()
+    try:
+        client = _get_gemini_client()
+    except ValueError as e:
+        return {
+            "success": False,
+            "explanation": str(e),
+            "suggested_fix": None,
+            "corrected_code": None,
+            "model_used": "none",
+            "timestamp": timestamp,
+            "error": str(e),
+        }
     lang_name = explanation_language.capitalize()
     line_info = f"at or near line {line}" if line else "in the submitted program"
     type_info = f"({error_type})" if error_type else ""

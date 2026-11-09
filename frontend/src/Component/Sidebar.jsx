@@ -14,6 +14,7 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react';
+import { API_BASE_URL } from '../services/api';
 
 export default function Sidebar({
   activeTab,
@@ -201,7 +202,7 @@ export default function Sidebar({
                 ? 'bg-[#F0FDF4] text-[#21865A] border-[#BBF7D0]'
                 : 'bg-[#FEFCE8] text-[#D99A28] border-[#FEF08A]'
             }`}
-            title={isBackendOnline ? 'FastAPI Backend Online (localhost:8000)' : 'Connecting to backend...'}
+            title={isBackendOnline ? `FastAPI Backend Online (${API_BASE_URL})` : `Connecting to backend (${API_BASE_URL})...`}
           >
             {isBackendOnline ? (
               <>

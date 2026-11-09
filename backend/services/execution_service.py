@@ -37,6 +37,9 @@ SAFE_ENV_VARS = [
     "PATHEXT",
     "TEMP",
     "TMP",
+    "TMPDIR",
+    "LANG",
+    "LC_ALL",
     "NODE_PATH",
     "PYTHONPATH",
     "JAVA_HOME",
@@ -248,7 +251,7 @@ def compile_code(code: str, language: str) -> Dict[str, Any]:
     if lang == "c":
         with tempfile.TemporaryDirectory() as temp_dir:
             src_file = os.path.join(temp_dir, "program.c")
-            out_file = os.path.join(temp_dir, "program.exe")
+            out_file = os.path.join(temp_dir, "program.exe" if os.name == "nt" else "program")
             with open(src_file, "w", encoding="utf-8") as f:
                 f.write(code)
 
@@ -304,7 +307,7 @@ def compile_code(code: str, language: str) -> Dict[str, Any]:
     if lang in ("cpp", "c++", "cplusplus"):
         with tempfile.TemporaryDirectory() as temp_dir:
             src_file = os.path.join(temp_dir, "program.cpp")
-            out_file = os.path.join(temp_dir, "program.exe")
+            out_file = os.path.join(temp_dir, "program.exe" if os.name == "nt" else "program")
             with open(src_file, "w", encoding="utf-8") as f:
                 f.write(code)
 
@@ -510,7 +513,7 @@ def execute_code_sandboxed(
     if lang == "c":
         with tempfile.TemporaryDirectory() as temp_dir:
             src_file = os.path.join(temp_dir, "prog.c")
-            exe_file = os.path.join(temp_dir, "prog.exe")
+            exe_file = os.path.join(temp_dir, "prog.exe" if os.name == "nt" else "prog")
             with open(src_file, "w", encoding="utf-8") as f:
                 f.write(clean_code)
 
@@ -546,7 +549,7 @@ def execute_code_sandboxed(
     if lang in ("cpp", "c++", "cplusplus"):
         with tempfile.TemporaryDirectory() as temp_dir:
             src_file = os.path.join(temp_dir, "prog.cpp")
-            exe_file = os.path.join(temp_dir, "prog.exe")
+            exe_file = os.path.join(temp_dir, "prog.exe" if os.name == "nt" else "prog")
             with open(src_file, "w", encoding="utf-8") as f:
                 f.write(clean_code)
 

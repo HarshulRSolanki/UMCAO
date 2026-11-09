@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Settings, ShieldCheck, Sparkles, Terminal, Sliders, CheckCircle2, RefreshCw } from 'lucide-react';
-import { checkBackendHealth } from '../services/api';
+import { API_BASE_URL, checkBackendHealth } from '../services/api';
 
 export default function SettingsPanel({
   settings,
@@ -19,11 +19,13 @@ export default function SettingsPanel({
       setIsBackendOnline(res.healthy);
       setHealthStatus({
         ok: res.healthy,
-        message: res.healthy ? 'Backend API connection verified successfully!' : 'Could not reach backend at localhost:8000',
+        message: res.healthy
+          ? `Backend API connected cleanly (${API_BASE_URL})`
+          : res.error || `Could not reach backend at ${API_BASE_URL}`,
       });
     } catch {
       setIsBackendOnline(false);
-      setHealthStatus({ ok: false, message: 'Backend unreachable.' });
+      setHealthStatus({ ok: false, message: `Backend unreachable at ${API_BASE_URL}.` });
     } finally {
       setTestingHealth(false);
     }
@@ -122,7 +124,7 @@ export default function SettingsPanel({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-semibold text-[#202824] block">Endpoint Target</span>
-            <span className="font-mono text-xs text-[#68736D]">http://127.0.0.1:8000/api</span>
+            <span className="font-mono text-xs text-[#68736D] break-all">{API_BASE_URL}</span>
           </div>
 
           <button

@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Menu,
 } from 'lucide-react';
+import { API_BASE_URL } from '../services/api';
 
 export default function Navbar({
   isBackendOnline,
@@ -118,7 +119,7 @@ export default function Navbar({
                   ? 'bg-[#F0FDF4] text-[#21865A] border-[#BBF7D0]'
                   : 'bg-[#FEFCE8] text-[#D99A28] border-[#FEF08A]'
               }`}
-              title={isBackendOnline ? 'FastAPI Backend Online (localhost:8000)' : 'Connecting to API server...'}
+              title={isBackendOnline ? `FastAPI Backend Online (${API_BASE_URL})` : `Connecting to API server (${API_BASE_URL})...`}
             >
               {isBackendOnline ? (
                 <>

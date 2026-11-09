@@ -1,0 +1,17 @@
+# Render Blueprint Specification for UMCAO
+# Deploys UMCAO as a unified Docker Web Service (Frontend + FastAPI + 5 Runtimes)
+services:
+  - type: web
+    name: umcao
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: SERVE_FRONTEND
+        value: "true"
+

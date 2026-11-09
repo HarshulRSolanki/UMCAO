@@ -3,7 +3,38 @@
  * Handles communication between React frontend and FastAPI backend.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+function resolveApiBaseUrl() {
+  const raw = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').trim();
+
+  if (!raw) {
+    return import.meta.env.DEV ? 'http://127.0.0.1:8000/api' : '/api';
+  }
+
+  let normalized = raw.replace(/\/+$/, '');
+
+  // If a bare hostname is provided (e.g. from Render host property), add https://
+  if (!normalized.startsWith('http://') && !normalized.startsWith('https://') && !normalized.startsWith('/')) {
+    normalized = `https://${normalized}`;
+  }
+
+  // Ensure /api prefix is present so endpoints like /health, /analyze, /code/* always match FastAPI routers
+  if (normalized !== '/api' && !normalized.endsWith('/api')) {
+    normalized = `${normalized}/api`;
+  }
+
+  return normalized;
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
+
+function createTimeoutSignal(ms) {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+    return AbortSignal.timeout(ms);
+  }
+  const controller = new AbortController();
+  setTimeout(() => controller.abort(), ms);
+  return controller.signal;
+}
 
 export async function analyzeCode(code, language = 'python', options = {}) {
   try {
@@ -67,13 +98,31 @@ export async function getSamplePresets(language = 'python') {
 }
 
 export async function checkBackendHealth() {
+  const timeoutMs = import.meta.env.DEV ? 5000 : 45000;
   try {
-    const response = await fetch(`${API_BASE_URL}/health`, { signal: AbortSignal.timeout(3000) });
-    if (!response.ok) return { healthy: false };
+    const response = await fetch(`${API_BASE_URL}/health`, {
+      signal: createTimeoutSignal(timeoutMs),
+    });
+    if (!response.ok) {
+      return { healthy: false, status: response.status, url: `${API_BASE_URL}/health` };
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      return {
+        healthy: false,
+        status: response.status,
+        error: 'Backend returned HTML instead of JSON. Verify VITE_API_BASE_URL points to the FastAPI backend.',
+        url: `${API_BASE_URL}/health`,
+      };
+    }
     const data = await response.json();
-    return { healthy: data.status === 'healthy', data };
-  } catch {
-    return { healthy: false };
+    return { healthy: data.status === 'healthy', data, url: `${API_BASE_URL}/health` };
+  } catch (err) {
+    return {
+      healthy: false,
+      error: err?.message || 'Unable to reach backend server',
+      url: `${API_BASE_URL}/health`,
+    };
   }
 }
 

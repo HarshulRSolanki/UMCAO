@@ -11,6 +11,7 @@ import SettingsPanel from './Component/SettingsPanel';
 import DocsModal from './Component/DocsModal';
 import Footer from './Component/Footer';
 import {
+  API_BASE_URL,
   analyzeCode,
   analyzeAndRunCode,
   getLanguages,
@@ -205,7 +206,11 @@ export default function App() {
     } catch (err) {
       console.error('Analyze & Run failed:', err);
       setApiError(
-        err.message || 'Unable to connect to UMCAO backend API. Please make sure the FastAPI server is running on http://127.0.0.1:8000'
+        `Unable to reach UMCAO Backend API at (${API_BASE_URL}). ${
+          err.message === 'Failed to fetch'
+            ? 'The Render backend may still be waking up (cold start takes ~30s), or CORS / VITE_API_BASE_URL is misconfigured.'
+            : err.message
+        }`
       );
       setIsBackendOnline(false);
     } finally {
@@ -231,7 +236,11 @@ export default function App() {
     } catch (err) {
       console.error('AST Analysis failed:', err);
       setApiError(
-        err.message || 'Unable to connect to UMCAO backend API. Please make sure the FastAPI server is running on http://127.0.0.1:8000'
+        `Unable to reach UMCAO Backend API at (${API_BASE_URL}). ${
+          err.message === 'Failed to fetch'
+            ? 'The Render backend may still be waking up, or CORS / VITE_API_BASE_URL needs to be checked.'
+            : err.message
+        }`
       );
       setIsBackendOnline(false);
     } finally {
